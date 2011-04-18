@@ -26,6 +26,7 @@ from Exceptions import *
 from ACL import ACL, GranteeLogDelivery
 from AccessLog import AccessLog
 from S3Uri import S3Uri
+from Versioning import VersioningConfiguration
 
 __all__ = []
 class S3Request(object):
@@ -239,9 +240,18 @@ class S3(object):
 		return response
 
 	def bucket_info(self, uri):
+		request = self.create_request("BUCKET_LIST", bucket = uri.bucket(), extra = "?versioning")
+		response = self.send_request(request)
+		tree = getTreeFromXml(response['data'])
+		status_node = tree.find('Status')
+		versioning_state = status_node.text if status_node is not None else "Disabled"
+
 		request = self.create_request("BUCKET_LIST", bucket = uri.bucket(), extra = "?location")
 		response = self.send_request(request)
-		response['bucket-location'] = getTextFromXml(response['data'], "LocationConstraint") or "any"
+		bucket_location = getTextFromXml(response['data'], "LocationConstraint") or "any"
+
+		response['bucket-location'] = bucket_location
+		response['versioning-state'] = versioning_state
 		return response
 
 	def object_put(self, filename, uri, extra_headers = None, extra_label = ""):
@@ -345,6 +355,14 @@ class S3(object):
 		response = self.send_request(request, body)
 		return response
 
+	def set_versioning(self, uri, versioning):
+		request = self.create_request("BUCKET_CREATE", bucket = uri.bucket(), extra = "?versioning")
+		body = str(VersioningConfiguration(state=versioning))
+		response = self.send_request(request, body)
+
+		return response
+
+		
 	def get_accesslog(self, uri):
 		request = self.create_request("BUCKET_LIST", bucket = uri.bucket(), extra = "?logging")
 		response = self.send_request(request)

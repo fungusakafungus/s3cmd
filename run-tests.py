@@ -124,8 +124,8 @@ def test(label, cmd_args = [], retcode = 0, must_find = [], must_not_find = [], 
 
 	if not cmd_args:
 		return skip()
-
-	p = Popen(cmd_args, stdout = PIPE, stderr = STDOUT, universal_newlines = True)
+	os.environ['LANG'] = 'en_US.utf8'
+	p = Popen(cmd_args, stdout = PIPE, stderr = STDOUT, universal_newlines = True, env = os.environ)
 	stdout, stderr = p.communicate()
 	if retcode != p.returncode:
 		return failure("retcode: %d, expected: %d" % (p.returncode, retcode))
@@ -361,6 +361,46 @@ test_s3cmd("Put public, guess MIME", ['put', '--guess-mime-type', '--acl-public'
 if have_wget:
 	test("Retrieve from URL", ['wget', '-O', 'testsuite-out/logo.png', 'http://%s.s3.amazonaws.com/xyz/etc/logo.png' % bucket(1)],
 		must_find_re = [ 'logo.png.*saved \[22059/22059\]' ])
+
+## ====== Verify Default Versioning
+test_s3cmd("Verify default versioning", ['info', '%s' % pbucket(1) ],
+	must_find_re = [ "Versioning:.*Disabled"])
+
+
+## ====== Set Versioning to Disabled
+test_s3cmd("Change versioning to Disabled", ['setversioning', '%s' % pbucket(1), '0'],
+	must_find = [ "%s/: Versioning set to Suspended" % pbucket(1)])
+
+
+## ====== Verify disabling versioning when disabled
+test_s3cmd("Verify disabling versioning when disabled", ['info', '%s' % pbucket(1) ],
+	must_find_re = [ "Versioning:.*Suspended"])
+
+
+## ====== Change Versioning to Enabled
+test_s3cmd("Change versioning to Enabled", ['setversioning', '%s' % pbucket(1), '1'],
+	must_find = [ "%s/: Versioning set to Enabled" % pbucket(1)])
+
+
+## ====== Verify enabling versioning when disabled
+test_s3cmd("Verify enabling versioning when disabled", ['info', '%s' % pbucket(1) ],
+	must_find_re = [ "Versioning:.*Enabled"])
+
+## ====== Disable versioning when enabled
+test_s3cmd("Change versioning to Disabled", ['setversioning', '%s' % pbucket(1), '0'],
+	must_find = [ "%s/: Versioning set to Suspended" % pbucket(1) ])
+
+
+## ====== Verify disabling versioning
+test_s3cmd("Verify disabling versioning when enabled", ['info', '%s' % pbucket(1) ],
+	must_find_re = [ "Versioning:.*Suspended"])
+
+
+## ====== Verify Private ACL
+if have_wget:
+	test("Verify Private ACL", ['wget', '-O', 'testsuite-out/logo.png', 'http://%s.s3.amazonaws.com/xyz/etc/logo.png' % bucket(1)],
+		retcode = 1,
+		must_find_re = [ 'ERROR 403: Forbidden' ])
 
 
 ## ====== Change ACL to Private

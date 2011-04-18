@@ -57,6 +57,9 @@ Move object
 s3cmd \fBsetacl\fR \fIs3://BUCKET[/OBJECT]\fR
 Modify Access control list for Bucket or Files
 .TP
+s3cmd \fBsetversioning\fR \fIs3://BUCKET {0|1}\fR
+Set versioning status for Bucket
+.TP
 s3cmd \fBaccesslog\fR \fIs3://BUCKET\fR
 Enable/disable bucket access logging
 .TP
@@ -105,7 +108,7 @@ show this help message and exit
 Invoke interactive (re)configuration tool.
 .TP
 \fB\-c\fR FILE, \fB\-\-config\fR=FILE
-Config file name. Defaults to /home/mludvig/.s3cfg
+Config file name. Defaults to /home/margolin/.s3cfg
 .TP
 \fB\-\-dump\-config\fR
 Dump current configuration after parsing config files
