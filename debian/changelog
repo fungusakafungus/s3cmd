@@ -1,3 +1,9 @@
+s3cmd (1.0.0-4jimdo) stable; urgency=low
+
+  * Add dist and build to clean
+
+ -- Ilya Margolin <ilya@jimdo.com>  Tue, 19 Apr 2011 19:35:16 +0200
+
 s3cmd (1.0.0-4) stable; urgency=low
 
   * Rebuild on Debian 5 for better compatibility.

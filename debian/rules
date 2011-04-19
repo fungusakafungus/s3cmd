@@ -13,6 +13,7 @@ clean: clean-patched unpatch
 	dh_testroot
 
 	-rm -f S3/*.pyc
+	-rm -rf dist build
 
 	dh_clean
 
