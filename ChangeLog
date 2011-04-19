@@ -1,3 +1,7 @@
+2011-04-19  ilya@jimdo.com
+
+	* Added initial versioning support.
+
 2011-04-11  Michal Ludvig  <mludvig@logix.net.nz>
 
 	* S3/S3Uri.py: Fixed cf:// uri parsing.

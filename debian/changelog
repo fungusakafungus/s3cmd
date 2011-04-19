@@ -1,7 +1,3 @@
-s3cmd (1.0.0-4-jimdo) stable; urgency=low
-
-  * Added initial versioning support.
-
 s3cmd (1.0.0-4) stable; urgency=low
 
   * Rebuild on Debian 5 for better compatibility.
